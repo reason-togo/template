@@ -100,16 +100,16 @@
 - **소요 시간**: 40분
 - **참고**: selected/unselected 상태 전환, TypeScript 타입 체크 통과
 
-#### [ ] 🟠 P1: StatBadge 컴포넌트 구현
+#### [x] 🟠 P1: StatBadge 컴포넌트 구현
 
 - **레이어**: shared-ui
-- **작업 내용**: 통계 배지 구현 (label, value)
-- **작업 이유**: 공통 UI 컴포넌트 구축
-- **작업 결과**: -
-- **커밋**: -
-- **이슈**: #2
-- **소요 시간**: -
-- **참고**: -
+- **작업 내용**: 통계 배지 구현 (label, value), gradient background
+- **작업 이유**: 공통 UI 컴포넌트 구축 (시간/비용 표시)
+- **작업 결과**: label/value 수직 레이아웃, gradient background, border 스타일 완료
+- **커밋**: [진행중]
+- **이슈**: #4
+- **소요 시간**: 20분
+- **참고**: TypeScript 타입 체크 통과, 빌드 성공
 
 #### [ ] 🟠 P1: HighlightBox 컴포넌트 구현
 
