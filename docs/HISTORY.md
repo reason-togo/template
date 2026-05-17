@@ -106,7 +106,7 @@
 - **작업 내용**: 통계 배지 구현 (label, value), gradient background
 - **작업 이유**: 공통 UI 컴포넌트 구축 (시간/비용 표시)
 - **작업 결과**: label/value 수직 레이아웃, gradient background, border 스타일 완료
-- **커밋**: [진행중]
+- **커밋**: 3f26fe5
 - **이슈**: #4
 - **소요 시간**: 20분
 - **참고**: TypeScript 타입 체크 통과, 빌드 성공
