@@ -24,25 +24,47 @@
 
 ### 오늘의 목표
 
-- [ ] 프로젝트 초기 설정
+- [x] 프로젝트 초기 설정
+- [x] 프로젝트 문서 구조 정리
 - [ ] 공통 UI 컴포넌트 5개 구현
 - [ ] 목업 데이터 작성
 
 ---
 
-#### [ ] 🔴 P0: 프로젝트 초기 설정
+#### [x] 🔴 P0: 프로젝트 초기 설정
 
 - **레이어**: config
 - **작업 내용**:
-  - Next.js 15 프로젝트 생성
-  - shadcn/ui 초기화
-  - TailwindCSS 커스텀 컬러 설정
-  - FSD 폴더 구조 생성
+  - Next.js 15 프로젝트 생성 (TypeScript, TailwindCSS, App Router)
+  - shadcn/ui 초기화 및 기본 컴포넌트 설치 (button, card, badge, separator)
+  - TailwindCSS 커스텀 컬러 팔레트 설정 (beige tone)
+  - 폰트 설정 (DM Serif Display, Inter)
+  - globals.css 작성 (CSS 변수, 필름 그레인 효과)
+  - FSD 폴더 구조 생성 (app, widgets, features, entities, shared)
+  - cn 유틸 함수 및 라우트 상수 작성
 - **작업 이유**: 프로젝트 개발 환경 구축
-- **작업 결과**: -
-- **커밋**: -
-- **이슈**: #1
-- **소요 시간**: -
+- **작업 결과**: Phase 1 완료, 개발 서버 실행 가능
+- **커밋**: 2fdc529
+- **이슈**: -
+- **소요 시간**: 1.5시간
+- **참고**: Tailwind v4 사용, @theme inline 방식
+
+#### [x] 📄 Docs: 프로젝트 문서 구조 정리
+
+- **레이어**: docs
+- **작업 내용**:
+  - src/docs를 루트 docs/ 폴더로 이동
+  - 파일명 통일 (PROJECT_STATUS.md, TODO_GUIDE.md 등)
+  - 루트 TODO.md를 docs/TODO.md로 통합
+  - 기획서를 docs/PROPOSAL.md로 이동
+  - AGENTS.md, CLAUDE.md를 docs로 이동
+  - README.md 작성 (프로젝트 소개, 문서 구조)
+  - .clinerules 업데이트 (docs 경로 반영)
+- **작업 이유**: 문서 관리 자동화 및 접근성 향상
+- **작업 결과**: 모든 md 파일이 docs/에 통합
+- **커밋**: 8cc26bb
+- **이슈**: -
+- **소요 시간**: 0.5시간
 - **참고**: -
 
 #### [ ] 🟠 P1: Logo 컴포넌트 구현
@@ -118,11 +140,15 @@
 
 ### 오늘의 성과
 
-✅ 완료: 0개  
-🔄 진행중: 0개  
-📋 예정: 7개
+✅ 완료: 2개
+🔄 진행중: 0개
+📋 예정: 5개
 
-**총 소요 시간**: 0시간
+**총 소요 시간**: 2시간
+
+**완료된 작업:**
+- 프로젝트 초기 설정 (Next.js 15 + FSD 구조)
+- 프로젝트 문서 구조 정리 및 통합
 
 ---
 
@@ -136,9 +162,10 @@
 
 ### 메모
 
-- Claude Code 프롬프트 준비 완료
-- 커밋 컨벤션 가이드 작성 완료
-- 작업 히스토리 가이드 작성 완료
+- Phase 1 (프로젝트 세팅) 완료
+- 모든 프로젝트 문서가 docs/에 통합됨
+- GitHub에 푸시 완료 (origin/main)
+- 다음: Phase 2 (공통 UI 컴포넌트 구현)
 
 ---
 
