@@ -137,6 +137,21 @@
 - **소요 시간**: 30분
 - **참고**: TypeScript 타입 체크 통과, 빌드 성공
 
+#### [x] 🟠 P1: Entities 레이어 UI 컴포넌트 구현
+
+- **레이어**: entities-place, entities-course
+- **작업 내용**:
+  - PlaceImage.tsx (이미지 또는 gradient placeholder)
+  - PlaceInfo.tsx (장소 정보 표시)
+  - CourseStep.tsx (Compound Component: Root, Number, Content, Title, Info)
+  - TransportInfo.tsx (이동 정보: 도보/차량 아이콘)
+- **작업 이유**: Place와 Course 엔티티의 UI 컴포넌트 구축
+- **작업 결과**: 4개 컴포넌트 생성, Compound Component 패턴 적용
+- **커밋**: [진행중]
+- **이슈**: #7
+- **소요 시간**: 25분
+- **참고**: TypeScript 타입 체크 통과, 빌드 성공, lucide-react 아이콘 사용
+
 ---
 
 ### 오늘의 성과
