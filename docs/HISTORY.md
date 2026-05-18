@@ -164,7 +164,7 @@
   - PlaceCard.Stats (StatBadge 2개 조합)
 - **작업 이유**: 관광지 카드 Feature 구축, 모든 하위 컴포넌트 조합
 - **작업 결과**: 6개 서브 컴포넌트로 구성된 Compound Component 완성
-- **커밋**: [진행중]
+- **커밋**: 10942a9
 - **이슈**: #8
 - **소요 시간**: 20분
 - **참고**: TypeScript 타입 체크 통과, 빌드 성공, FSD 의존성 규칙 준수
@@ -173,11 +173,11 @@
 
 ### 오늘의 성과
 
-✅ 완료: 9개
+✅ 완료: 10개
 🔄 진행중: 0개
 📋 예정: 0개
 
-**총 소요 시간**: 4.75시간
+**총 소요 시간**: 5.0시간
 
 **완료된 작업:**
 - 프로젝트 초기 설정 (Next.js 15 + FSD 구조)
@@ -189,6 +189,7 @@
 - HighlightBox 컴포넌트 구현 (#5)
 - 타입 정의 및 목업 데이터 작성 (#6)
 - Entities 레이어 UI 컴포넌트 구현 (#7)
+- PlaceCard Compound Component 구현 (#8)
 
 ---
 
@@ -206,10 +207,11 @@
 - Phase 2 (공통 UI 컴포넌트 5개) 완료 ✅
 - Phase 3 (목업 데이터 작성) 완료 ✅
 - Phase 4 (Entities 레이어 UI 컴포넌트) 완료 ✅
+- Phase 5-1 (PlaceCard Compound Component) 완료 ✅
 - 모든 프로젝트 문서가 docs/에 통합됨
 - FSD 구조 완성: entities, features, shared 레이어 구축
 - Compound Component 패턴 적용 완료
-- 다음: Phase 5 (Features - PlaceCard Compound Component)
+- 다음: Phase 5-2 (CourseList Compound Component)
 
 ---
 
