@@ -289,20 +289,37 @@
   - CourseTimeline.tsx (코스 타임라인 섹션, CourseList 활용, 지도 placeholder)
 - **작업 이유**: 페이지 레벨 컴포넌트 구축, Features/Entities 조합
 - **작업 결과**: 3개 Widget 구현 완료, TypeScript 타입 체크 통과, 빌드 성공
-- **커밋**: [다음 커밋 예정]
+- **커밋**: 27299dc
 - **이슈**: #8
 - **소요 시간**: 40분
 - **참고**: FSD Widgets 레이어, 목업 데이터 활용, Compound Component 조합
+
+#### [x] 🔴 P0: 페이지 구현 6개 (Phase 7)
+
+- **레이어**: app
+- **작업 내용**:
+  - page.tsx (랜딩 페이지, LandingHero Widget 사용)
+  - preferences/page.tsx (취향 입력 3단계, useState로 step 관리)
+  - recommendations/page.tsx (추천 페이지, localStorage 찜하기)
+  - course/page.tsx (코스 페이지, localStorage 저장)
+  - place/[id]/page.tsx (관광지 상세, 동적 라우트)
+  - favorites/page.tsx (찜 목록, localStorage 읽기, 빈 상태 처리)
+- **작업 이유**: 모든 페이지 UI 완성 및 페이지 간 이동 구현
+- **작업 결과**: 6개 페이지 구현 완료, 페이지 이동 플로우 구현, 빌드 성공
+- **커밋**: [다음 커밋 예정]
+- **이슈**: #9
+- **소요 시간**: 1.5시간
+- **참고**: 'use client' 사용, useRouter로 페이지 이동, localStorage 활용
 
 ---
 
 ### 오늘의 성과
 
-✅ 완료: 14개
+✅ 완료: 15개
 🔄 진행중: 0개
 📋 예정: 0개
 
-**총 소요 시간**: 7.55시간
+**총 소요 시간**: 9.05시간
 
 **완료된 작업:**
 - 프로젝트 초기 설정 (Next.js 15 + FSD 구조)
@@ -319,6 +336,7 @@
 - 전체 테스트 코드 작성 (76개 테스트 통과)
 - Preferences 컴포넌트 3개 구현 (#7)
 - Widgets 레이어 3개 구현 (#8)
+- 페이지 구현 6개 (#9)
 
 ---
 
@@ -341,12 +359,17 @@
   - Preferences 컴포넌트 3개 (StyleSelector, InterestSelector, ScheduleSelector) 완료
 - Phase 6 (Widgets 레이어) 완료 ✅
   - LandingHero, PlaceRecommendation, CourseTimeline 완료
+- Phase 7 (페이지 구현 6개) 완료 ✅
+  - 랜딩, 취향 입력, 추천, 코스, 상세, 찜 목록 페이지 완료
+  - 페이지 간 이동 플로우 구현
+  - localStorage 기반 찜하기/저장 기능 구현
 - Storybook 설정 및 스토리 파일 11개 완료 ✅
 - Vitest 설정 및 테스트 코드 11개 완료 (76개 테스트 통과) ✅
 - 모든 프로젝트 문서가 docs/에 통합됨
 - FSD 구조 완성: app, widgets, features, entities, shared 레이어 구축
 - Compound Component 패턴 적용 완료
-- 다음: Phase 7 (페이지 구현 6개)
+- **🎉 모든 페이지 UI 및 목업 데이터 기반 페이지 이동 구현 완료!**
+- 다음: API 연동 또는 추가 기능 구현
 
 ---
 
