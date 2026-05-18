@@ -169,6 +169,20 @@
 - **소요 시간**: 20분
 - **참고**: TypeScript 타입 체크 통과, 빌드 성공, FSD 의존성 규칙 준수
 
+#### [x] 🟠 P1: CourseList Compound Component 구현
+
+- **레이어**: features-course-list
+- **작업 내용**:
+  - CourseList.Root (코스 리스트 컨테이너)
+  - CourseList.Item (CourseStep 기반)
+  - CourseList.Transport (TransportInfo 기반)
+- **작업 이유**: 코스 타임라인 Feature 구축, CourseStep/TransportInfo 조합
+- **작업 결과**: 3개 서브 컴포넌트로 구성된 Compound Component 완성
+- **커밋**: [진행중]
+- **이슈**: #9
+- **소요 시간**: 15분
+- **참고**: TypeScript 타입 체크 통과, 빌드 성공, FSD 의존성 규칙 준수
+
 ---
 
 ### 오늘의 성과
