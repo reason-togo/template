@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -28,14 +31,22 @@
     "@storybook/nextjs": "^8.6.18",
     "@storybook/react": "^8.6.18",
     "@storybook/test": "^8.6.18",
-    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/ui": "^4.1.6",
+    "autoprefixer": "^10.5.0",
     "eslint": "^9",
     "eslint-config-next": "^15.1.0",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.5.14",
     "storybook": "^8.6.18",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5",
+    "vitest": "^4.1.6"
   }
 }

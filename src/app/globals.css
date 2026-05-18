@@ -1,42 +1,23 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: 32 22 17;
-  --primary: 30 38% 66%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 30 26% 30%;
-  --accent: 30 38% 84%;
-  --border: 30 30% 85%;
-  --radius: 0.5rem;
-}
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: 32 22 17;
+    --primary: 30 38% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 26% 30%;
+    --accent: 30 38% 84%;
+    --border: 30 30% 85%;
+    --radius: 0.5rem;
+  }
 
-@theme inline {
-  /* Colors */
-  --color-background: var(--background);
-  --color-foreground: hsl(var(--foreground));
-  --color-primary-50: #FAF7F2;
-  --color-primary-100: #F5EFE7;
-  --color-primary-200: #E8D5C4;
-  --color-primary-300: #D4A882;
-  --color-primary-400: #C99871;
-  --color-primary-500: #B8865F;
-  --color-primary-DEFAULT: #D4A882;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary-DEFAULT: #5C4A3A;
-  --color-accent-DEFAULT: #E8D5C4;
-  --color-border: hsl(var(--border));
-  --color-muted-foreground: hsl(var(--foreground) / 0.6);
-
-  /* Fonts */
-  --font-sans: var(--font-pretendard);
-  --font-serif: var(--font-dm-serif);
-}
-
-body {
-  background: var(--background);
-  color: hsl(var(--foreground));
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-pretendard), system-ui, -apple-system, sans-serif;
+  }
 }
 
 /* Film Grain Effect */
