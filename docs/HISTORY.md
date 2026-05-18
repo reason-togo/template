@@ -147,7 +147,7 @@
   - TransportInfo.tsx (이동 정보: 도보/차량 아이콘)
 - **작업 이유**: Place와 Course 엔티티의 UI 컴포넌트 구축
 - **작업 결과**: 4개 컴포넌트 생성, Compound Component 패턴 적용
-- **커밋**: [진행중]
+- **커밋**: fea99dc
 - **이슈**: #7
 - **소요 시간**: 25분
 - **참고**: TypeScript 타입 체크 통과, 빌드 성공, lucide-react 아이콘 사용
@@ -156,11 +156,11 @@
 
 ### 오늘의 성과
 
-✅ 완료: 8개
+✅ 완료: 9개
 🔄 진행중: 0개
 📋 예정: 0개
 
-**총 소요 시간**: 4.5시간
+**총 소요 시간**: 4.75시간
 
 **완료된 작업:**
 - 프로젝트 초기 설정 (Next.js 15 + FSD 구조)
@@ -171,6 +171,7 @@
 - StatBadge 컴포넌트 구현 (#4)
 - HighlightBox 컴포넌트 구현 (#5)
 - 타입 정의 및 목업 데이터 작성 (#6)
+- Entities 레이어 UI 컴포넌트 구현 (#7)
 
 ---
 
@@ -187,9 +188,11 @@
 - Phase 1 (프로젝트 세팅) 완료 ✅
 - Phase 2 (공통 UI 컴포넌트 5개) 완료 ✅
 - Phase 3 (목업 데이터 작성) 완료 ✅
+- Phase 4 (Entities 레이어 UI 컴포넌트) 완료 ✅
 - 모든 프로젝트 문서가 docs/에 통합됨
 - FSD 구조 완성: entities, features, shared 레이어 구축
-- 다음: Phase 4 (Entities 레이어 UI 컴포넌트)
+- Compound Component 패턴 적용 완료
+- 다음: Phase 5 (Features - PlaceCard Compound Component)
 
 ---
 
