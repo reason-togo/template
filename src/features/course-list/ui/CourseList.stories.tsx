@@ -4,7 +4,6 @@ import { MOCK_COURSES } from '@/shared/mock/courses';
 
 const meta = {
   title: 'Features/CourseList',
-  component: CourseList.Root,
   parameters: {
     layout: 'centered',
   },
@@ -16,7 +15,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof CourseList.Root>;
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

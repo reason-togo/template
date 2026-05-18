@@ -259,20 +259,36 @@
   - features 테스트 2개 (PlaceCard, CourseList)
 - **작업 이유**: 모든 컴포넌트 단위 테스트 완성, 코드 품질 보장
 - **작업 결과**: 총 76개 테스트 통과 (shared-ui: 34, entities: 19, features: 23)
-- **커밋**: [다음 커밋 예정]
+- **커밋**: a66efd3
 - **이슈**: #6
 - **소요 시간**: 1시간
 - **참고**: Vitest + @testing-library/react, 모든 컴포넌트 렌더링/props/className 테스트 완료
+
+#### [x] 🟠 P1: Preferences 컴포넌트 3개 구현
+
+- **레이어**: features-preferences
+- **작업 내용**:
+  - StyleSelector.tsx (여행 스타일 선택, 단일 선택)
+  - InterestSelector.tsx (관심사 + 기피사항, 다중 선택)
+  - ScheduleSelector.tsx (일정 + 지역, 각각 단일 선택)
+  - Chip 컴포넌트에 className prop 추가
+  - Storybook 파일 타입 에러 수정 (compound component 처리)
+- **작업 이유**: 취향 입력 페이지에서 사용할 선택 컴포넌트 구축
+- **작업 결과**: 3개 컴포넌트 구현 완료, TypeScript 타입 체크 통과, 빌드 성공
+- **커밋**: [다음 커밋 예정]
+- **이슈**: #7
+- **소요 시간**: 50분
+- **참고**: 목업 데이터 (preferences.ts) 활용, Chip 컴포넌트 기반
 
 ---
 
 ### 오늘의 성과
 
-✅ 완료: 12개
+✅ 완료: 13개
 🔄 진행중: 0개
 📋 예정: 0개
 
-**총 소요 시간**: 6.25시간
+**총 소요 시간**: 7.15시간
 
 **완료된 작업:**
 - 프로젝트 초기 설정 (Next.js 15 + FSD 구조)
@@ -287,6 +303,7 @@
 - PlaceCard Compound Component 구현 (#8)
 - CourseList Compound Component 구현 (#9)
 - 전체 테스트 코드 작성 (76개 테스트 통과)
+- Preferences 컴포넌트 3개 구현 (#7)
 
 ---
 
@@ -304,14 +321,15 @@
 - Phase 2 (공통 UI 컴포넌트 5개) 완료 ✅
 - Phase 3 (목업 데이터 작성) 완료 ✅
 - Phase 4 (Entities 레이어 UI 컴포넌트) 완료 ✅
-- Phase 5 (Features - Compound Components) 완료 ✅
-  - PlaceCard, CourseList 모두 완료
+- Phase 5 (Features) 완료 ✅
+  - PlaceCard, CourseList Compound Components 완료
+  - Preferences 컴포넌트 3개 (StyleSelector, InterestSelector, ScheduleSelector) 완료
 - Storybook 설정 및 스토리 파일 11개 완료 ✅
 - Vitest 설정 및 테스트 코드 11개 완료 (76개 테스트 통과) ✅
 - 모든 프로젝트 문서가 docs/에 통합됨
 - FSD 구조 완성: entities, features, shared 레이어 구축
 - Compound Component 패턴 적용 완료
-- 다음: Phase 6 (Preferences 기능 컴포넌트) 또는 Phase 7 (페이지 구현)
+- 다음: Phase 6 (Widgets) 또는 Phase 7 (페이지 구현)
 
 ---
 

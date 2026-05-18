@@ -4,7 +4,6 @@ import { MOCK_PLACES } from '@/shared/mock/places';
 
 const meta = {
   title: 'Features/PlaceCard',
-  component: PlaceCard.Root,
   parameters: {
     layout: 'centered',
   },
@@ -16,7 +15,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof PlaceCard.Root>;
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

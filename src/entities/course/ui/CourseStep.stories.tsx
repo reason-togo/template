@@ -3,7 +3,6 @@ import { CourseStep } from './CourseStep';
 
 const meta = {
   title: 'Entities/Course/CourseStep',
-  component: CourseStep.Root,
   parameters: {
     layout: 'centered',
   },
@@ -15,7 +14,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof CourseStep.Root>;
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

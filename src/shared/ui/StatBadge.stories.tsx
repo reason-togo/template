@@ -45,6 +45,10 @@ export const Distance: Story = {
 };
 
 export const Multiple: Story = {
+  args: {
+    label: '예상 시간',
+    value: '4시간',
+  },
   render: () => (
     <div className="flex gap-3">
       <StatBadge label="예상 시간" value="4시간" />
