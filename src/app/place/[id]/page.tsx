@@ -1,145 +1,252 @@
-'use client';
+"use client";
 
-import { useRouter, useParams } from 'next/navigation';
-import { MOCK_PLACES } from '@/shared/mock/places';
-import { PlaceCard } from '@/features/place-card/ui/PlaceCard';
-import { IconButton } from '@/shared/ui/IconButton';
-import { Button } from '@/shared/ui/button';
-import { ArrowLeft, MapPin, Clock, DollarSign, Car } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { StatusBar } from "@/shared/ui/StatusBar";
 
-const PlaceDetailPage = () => {
+interface PlaceDetail {
+  name: string;
+  location: string;
+  imageUrl?: string;
+  aiStory?: string;
+  timingReason?: string;
+  estimatedTime?: string;
+  estimatedCost?: string;
+  transitInfo?: string;
+  isSolo?: boolean;
+  contentId?: string;
+}
+
+interface CurationResult {
+  main?: PlaceDetail;
+  course?: Array<{ order: number; name: string; location: string; duration?: string; transport?: string }>;
+  context?: { weather?: string; sunsetRemaining?: string; sunsetTime?: string };
+}
+
+const HeroMountain = () => (
+  <svg
+    className="absolute bottom-0 left-0 right-0 w-full"
+    viewBox="0 0 390 80"
+    preserveAspectRatio="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M0,80 L0,50 L60,35 L110,45 L150,20 L190,35 L230,15 L270,30 L310,40 L390,25 L390,80 Z"
+      fill="rgba(92,61,30,0.5)"
+    />
+    <path
+      d="M0,80 L0,65 L80,55 L140,62 L200,48 L250,58 L310,55 L390,60 L390,80 Z"
+      fill="rgba(58,36,16,0.7)"
+    />
+  </svg>
+);
+
+export default function PlaceDetailPage() {
   const router = useRouter();
-  const params = useParams();
-  const placeId = params.id as string;
+  const [place, setPlace] = useState<PlaceDetail | null>(null);
+  const [courseSteps, setCourseSteps] = useState<CurationResult["course"]>([]);
+  const [ctx, setCtx] = useState<CurationResult["context"]>();
+  const [saved, setSaved] = useState(false);
 
-  const place = MOCK_PLACES.find((p) => p.id === placeId);
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("curation");
+      if (raw) {
+        const data: CurationResult = JSON.parse(raw);
+        setPlace(data.main ?? null);
+        setCourseSteps(data.course ?? []);
+        setCtx(data.context);
+
+        const arr = JSON.parse(localStorage.getItem("favorites") ?? "[]");
+        if (data.main?.contentId && arr.find((x: { id: string }) => x.id === data.main?.contentId)) {
+          setSaved(true);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const handleSave = () => {
+    setSaved((v) => !v);
+    if (!place) return;
+    try {
+      const arr = JSON.parse(localStorage.getItem("favorites") ?? "[]");
+      const id = place.contentId ?? place.name;
+      if (!saved) {
+        arr.unshift({ id, name: place.name, location: place.location, savedAt: new Date().toISOString() });
+      } else {
+        const idx = arr.findIndex((x: { id: string }) => x.id === id);
+        if (idx > -1) arr.splice(idx, 1);
+      }
+      localStorage.setItem("favorites", JSON.stringify(arr));
+    } catch {}
+  };
 
   if (!place) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl font-semibold text-secondary mb-2">
-            관광지를 찾을 수 없습니다
-          </p>
-          <Button onClick={() => router.back()}>돌아가기</Button>
-        </div>
+      <div className="screen bg-app-bg flex items-center justify-center">
+        <p className="text-brown-500 text-sm">정보를 불러오는 중…</p>
       </div>
     );
   }
 
-  const handleBack = () => {
-    router.back();
-  };
-
-  const handleAddToCourse = () => {
-    alert('코스 추가 기능은 곧 지원됩니다!');
-  };
-
-  // 하드코딩된 상세 정보
-  const detailInfo = {
-    hours: '09:00 - 18:00',
-    closedDay: '월요일',
-    fee: place.estimatedCost,
-    parking: '무료 주차 가능',
-  };
+  const infoGrid = [
+    { icon: "💰", label: "예상 비용", value: place.estimatedCost ?? "무료", note: "입장료 확인 필요" },
+    { icon: "🚇", label: "이동 시간", value: place.transitInfo ?? "약 30분", note: "대중교통 기준" },
+    { icon: "🚶", label: "총 코스", value: place.estimatedTime ?? "약 2시간", note: "도보 기준" },
+    { icon: "👤", label: "혼자 여행", value: place.isSolo !== false ? "최적 ⭐" : "추천", note: "산책하기 좋음" },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-[390px] mx-auto px-6 py-4">
-          <IconButton icon={ArrowLeft} onClick={handleBack} />
+    <div className="screen bg-app-bg flex flex-col">
+      {/* 히어로 (260px) */}
+      <div className="relative bg-hero flex-shrink-0" style={{ height: 260 }}>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-black/50" />
+        <HeroMountain />
+
+        <StatusBar dark />
+
+        {/* 뒤로 + 액션 버튼 */}
+        <div className="absolute left-5 flex items-center gap-2 z-10" style={{ top: 56 }}>
+          <button
+            onClick={() => router.back()}
+            className="w-[38px] h-[38px] rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center"
+          >
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+              <path d="M8.5 1L1.5 8L8.5 15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
+        <div className="absolute right-5 flex items-center gap-2 z-10" style={{ top: 56 }}>
+          <button
+            onClick={handleSave}
+            className="w-[38px] h-[38px] rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center text-base"
+          >
+            {saved ? "❤️" : "🤍"}
+          </button>
+          <button
+            onClick={() => router.push("/share")}
+            className="w-[38px] h-[38px] rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center text-base"
+          >
+            ⬆️
+          </button>
+        </div>
+
+        {/* 배지 + 타이밍 */}
+        <div className="absolute bottom-4 left-5 bg-brown-700 rounded-2xl px-3 py-1 text-[11px] font-bold text-white tracking-[0.04em]">
+          AI 추천 1순위 ✨
+        </div>
+        {ctx?.sunsetRemaining && (
+          <div className="absolute bottom-4 right-5 bg-black/45 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-[11px] text-white">
+            석양까지 {ctx.sunsetRemaining}
+          </div>
+        )}
       </div>
 
-      <div className="max-w-[390px] mx-auto px-6 py-6 space-y-6">
-        {/* Image Gallery */}
-        <div className="space-y-3">
-          {/* Main Image */}
-          <PlaceCard.Image src={place.imageUrl} alt={place.name} />
+      {/* 스크롤 콘텐츠 */}
+      <div className="flex-1 overflow-y-auto pb-[80px]">
+        <div className="px-5 pt-5">
+          {/* 장소 이름 */}
+          <h1
+            className="text-[26px] font-extrabold text-brown-900 mb-1.5"
+            style={{ letterSpacing: "-0.025em" }}
+          >
+            {place.name}
+          </h1>
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className="text-[13px] text-brown-500">📍 {place.location}</span>
+          </div>
 
-          {/* Thumbnail Images (Gradient Placeholders) */}
-          <div className="flex gap-2 overflow-x-auto">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="flex-shrink-0 w-24 h-24 rounded-xl bg-gradient-to-br from-primary-200 to-primary-300 flex items-center justify-center"
-              >
-                <span className="text-white/60 text-xs">사진 {i}</span>
+          {/* AI 스토리 블록 */}
+          <div className="bg-cream-50 rounded-2xl p-4 mb-4 shadow-card">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brown-700 to-brown-500 flex items-center justify-center text-sm">
+                ✨
+              </div>
+              <div>
+                <div className="text-[13px] font-bold text-brown-900">AI가 지금 추천하는 이유</div>
+                <div className="text-[11px] text-brown-500">
+                  {ctx?.weather ?? "실시간 분석"} 기준
+                </div>
+              </div>
+            </div>
+            <p className="text-[14.5px] text-brown-900 leading-[1.65]">
+              {place.aiStory ?? "지금 이 순간 날씨와 시간에 딱 맞는 여행지예요."}
+            </p>
+            {place.timingReason && (
+              <div className="mt-3 bg-gradient-to-br from-brown-700/8 to-brown-500/6 border border-brown-700/20 rounded-[14px] p-3 flex items-start gap-2.5">
+                <span className="text-xl flex-shrink-0">🌇</span>
+                <p className="text-[13px] text-brown-500 leading-[1.5]">{place.timingReason}</p>
+              </div>
+            )}
+          </div>
+
+          {/* 정보 그리드 2×2 */}
+          <div className="grid grid-cols-2 gap-2.5 mb-4">
+            {infoGrid.map((c) => (
+              <div key={c.label} className="bg-cream-50 rounded-[14px] p-3.5 shadow-light">
+                <div className="text-[22px] mb-1.5">{c.icon}</div>
+                <div className="text-[10.5px] text-brown-500 tracking-[0.05em] mb-0.5">{c.label}</div>
+                <div className="text-[15px] font-bold text-brown-900">{c.value}</div>
+                <div className="text-[11px] text-brown-500 mt-0.5">{c.note}</div>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Place Info */}
-        <div className="space-y-4">
-          <div>
-            <h1 className="text-2xl font-bold text-secondary mb-2">
-              {place.name}
-            </h1>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{place.address}</span>
-            </div>
+          {/* 교통 알림 */}
+          <div className="bg-brown-700 rounded-[14px] px-4 py-3.5 mb-4 flex items-center gap-3">
+            <span className="text-xl flex-shrink-0">🚆</span>
+            <p className="text-[13px] text-white/80 leading-[1.4]">
+              마지막 귀가 지하철{" "}
+              <span className="text-brown-200 font-bold">22:30</span>. 지금 출발하면 여유롭게 즐기고 돌아올 수 있어요.
+            </p>
           </div>
 
-          <p className="text-sm text-secondary leading-relaxed">
-            {place.description}
-          </p>
+          {/* 추천 동선 */}
+          {courseSteps && courseSteps.length > 0 && (
+            <>
+              <h3 className="text-[15px] font-bold text-brown-900 mb-3" style={{ letterSpacing: "-0.01em" }}>
+                추천 동선
+              </h3>
+              <div className="flex flex-col gap-2 mb-5">
+                {courseSteps.map((step, i) => (
+                  <div key={i} className="bg-cream-50 rounded-xl px-3.5 py-3 flex items-center gap-3 shadow-light">
+                    <div className="w-6 h-6 rounded-full bg-brown-700 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">
+                      {step.order}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[13.5px] font-semibold text-brown-900">{step.name}</div>
+                      <div className="text-[11.5px] text-brown-500 mt-0.5">{step.location}</div>
+                    </div>
+                    {step.duration && (
+                      <span className="text-[12px] text-brown-700 font-semibold whitespace-nowrap">{step.duration}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="h-3" />
         </div>
+      </div>
 
-        {/* Detail Information */}
-        <div className="space-y-3 p-4 bg-accent/20 rounded-xl">
-          <h3 className="text-sm font-semibold text-secondary">상세 정보</h3>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <Clock className="h-4 w-4 text-primary-400" />
-              <span className="text-sm text-secondary">
-                운영시간: {detailInfo.hours}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Clock className="h-4 w-4 text-primary-400" />
-              <span className="text-sm text-secondary">
-                휴무일: {detailInfo.closedDay}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <DollarSign className="h-4 w-4 text-primary-400" />
-              <span className="text-sm text-secondary">
-                입장료: {detailInfo.fee}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Car className="h-4 w-4 text-primary-400" />
-              <span className="text-sm text-secondary">
-                주차: {detailInfo.parking}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <PlaceCard.Stats
-          time={place.estimatedTime}
-          cost={place.estimatedCost}
-        />
-
-        {/* Add to Course Button */}
-        <Button
-          size="lg"
-          onClick={handleAddToCourse}
-          className="w-full bg-gradient-to-r from-primary-300 to-primary-400 hover:from-primary-400 hover:to-primary-500 text-white font-semibold shadow-md"
+      {/* 바텀 CTA */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-cream-50 border-t border-brown-200 px-5 flex items-center gap-2.5">
+        <button
+          onClick={handleSave}
+          className={`w-[50px] h-[50px] rounded-[14px] flex items-center justify-center text-[22px] transition-all ${
+            saved ? "bg-brown-700/10 border border-brown-700/30" : "bg-brown-100"
+          }`}
         >
-          코스에 추가
-        </Button>
+          {saved ? "❤️" : "🤍"}
+        </button>
+        <button
+          onClick={() => router.push("/course")}
+          className="flex-1 h-[50px] bg-brown-700 text-cream-50 rounded-[14px] text-[16px] font-bold shadow-btn btn-press"
+        >
+          여행 코스 보기 →
+        </button>
       </div>
     </div>
   );
-};
-
-export default PlaceDetailPage;
+}
