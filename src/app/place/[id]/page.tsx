@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { StatusBar } from "@/shared/ui/StatusBar";
 
 interface PlaceDetail {
@@ -99,9 +100,24 @@ export default function PlaceDetailPage() {
   return (
     <div className="screen bg-app-bg flex flex-col">
       {/* 히어로 (260px) */}
-      <div className="relative bg-hero flex-shrink-0" style={{ height: 260 }}>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-black/50" />
-        <HeroMountain />
+      <div className="relative flex-shrink-0" style={{ height: 260 }}>
+        {/* 배경 이미지 또는 기본 배경 */}
+        {place.imageUrl ? (
+          <Image
+            src={place.imageUrl}
+            alt={place.name}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        ) : (
+          <div className="absolute inset-0 bg-hero" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-black/50 z-[1]" />
+        <div className="relative z-[2]">
+          <HeroMountain />
+        </div>
 
         <StatusBar dark />
 

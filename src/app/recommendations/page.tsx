@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { StatusBar } from "@/shared/ui/StatusBar";
 import { BottomNavigation } from "@/shared/ui/BottomNavigation";
 
@@ -135,14 +136,22 @@ export default function RecommendationsPage() {
           onClick={() => goToDetail(main?.contentId)}
         >
           {/* 이미지 영역 */}
-          <div
-            className="h-40 relative flex items-end p-3.5"
-            style={{ background: GRADIENT_BGS[0] }}
-          >
-            <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-[11px] text-white">
+          <div className="h-40 relative flex items-end p-3.5">
+            {main?.imageUrl ? (
+              <Image
+                src={main.imageUrl}
+                alt={main.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <div className="absolute inset-0" style={{ background: GRADIENT_BGS[0] }} />
+            )}
+            <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-[11px] text-white z-10">
               {ctx?.sunsetRemaining ? `석양까지 ${ctx.sunsetRemaining}` : "지금 출발 → 도착 예정"}
             </div>
-            <div className="bg-brown-700 rounded-2xl px-3 py-1 text-[11px] font-bold text-white tracking-[0.04em]">
+            <div className="relative z-10 bg-brown-700 rounded-2xl px-3 py-1 text-[11px] font-bold text-white tracking-[0.04em]">
               AI 추천 1순위 ✨
             </div>
           </div>
@@ -199,10 +208,19 @@ export default function RecommendationsPage() {
             className="bg-cream-50 rounded-2xl overflow-hidden shadow-card flex cursor-pointer card-press"
             onClick={() => item && goToDetail(item.contentId)}
           >
-            <div
-              className="w-[100px] flex-shrink-0"
-              style={{ background: GRADIENT_BGS[(i + 1) % GRADIENT_BGS.length], minHeight: 100 }}
-            />
+            <div className="w-[100px] flex-shrink-0 relative" style={{ minHeight: 100 }}>
+              {item?.imageUrl ? (
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  sizes="100px"
+                />
+              ) : (
+                <div className="absolute inset-0" style={{ background: GRADIENT_BGS[(i + 1) % GRADIENT_BGS.length] }} />
+              )}
+            </div>
             <div className="flex-1 p-3.5">
               <p className="text-[15px] font-bold text-brown-900 mb-0.5" style={{ letterSpacing: "-0.01em" }}>
                 {item?.name ?? `주변 여행지 ${i + 1}`}
