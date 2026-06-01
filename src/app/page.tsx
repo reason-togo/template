@@ -1,11 +1,5 @@
-import { LandingHero } from '@/widgets/landing-hero/ui/LandingHero';
+import { LandingPage } from "@/widgets/landing/ui/LandingPage";
 
-const Home = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <LandingHero />
-    </div>
-  );
-};
-
-export default Home;
+export default function Home() {
+  return <LandingPage />;
+}

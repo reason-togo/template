@@ -3,33 +3,26 @@ import { cn } from "@/shared/lib/utils";
 interface ChipProps {
   label: string;
   icon?: string;
-  selected: boolean;
+  selected?: boolean;
   onClick?: () => void;
   className?: string;
 }
 
-export const Chip = ({
-  label,
-  icon,
-  selected,
-  onClick,
-  className,
-}: ChipProps) => {
+export const Chip = ({ label, icon, selected = false, onClick, className }: ChipProps) => {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex items-center gap-2 px-4 py-2 rounded-full",
-        "text-sm font-medium transition-all",
-        "focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2",
+        "inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-150 select-none whitespace-nowrap",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brown-700",
         selected
-          ? "bg-gradient-to-r from-primary-300 to-primary-400 text-white shadow-md"
-          : "border border-primary-200 bg-white text-secondary hover:border-primary-300 hover:bg-primary-50",
+          ? "bg-brown-900 text-cream-50 font-semibold"
+          : "bg-brown-100 text-brown-700 border border-brown-200 hover:bg-brown-200",
         className
       )}
     >
-      {icon && <span className="text-base">{icon}</span>}
+      {icon && <span>{icon}</span>}
       <span>{label}</span>
     </button>
   );

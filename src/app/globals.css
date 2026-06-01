@@ -4,35 +4,80 @@
 
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: 32 22 17;
-    --primary: 30 38% 66%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 30 26% 30%;
-    --accent: 30 38% 84%;
-    --border: 30 30% 85%;
     --radius: 0.5rem;
   }
 
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-pretendard), system-ui, -apple-system, sans-serif;
+    background-color: #EEEED0;
+    color: #3A2410;
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+    min-height: 100dvh;
+  }
+
+  /* 스크롤바 숨김 (모바일 네이티브 스크롤 유지) */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
   }
 }
 
-/* Film Grain Effect */
-.film-grain::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.03) 0px,
-    transparent 1px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 3px
-  );
-  pointer-events: none;
-  opacity: 0.3;
-  z-index: 1;
+@layer utilities {
+  /* 안전 영역 패딩 (노치/홈바 대응) */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* 모바일 앱 레이아웃 */
+  .screen {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    background-color: #EEEED0;
+  }
+
+  /* 산 실루엣 그래디언트 배경 */
+  .bg-landing {
+    background:
+      radial-gradient(ellipse 300% 60% at 50% 105%, rgba(112,80,46,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 15% 35%, rgba(144,120,87,0.07) 0%, transparent 40%),
+      linear-gradient(180deg, #EEEED0 0%, #E8E3D0 55%, #EEEED0 100%);
+  }
+
+  /* 히어로 그래디언트 (상세, 공유 화면) */
+  .bg-hero {
+    background: linear-gradient(160deg, #5C3D1E 0%, #7A5434 40%, #907857 70%, #6B5040 100%);
+  }
+
+  /* 출발 스트립 그래디언트 */
+  .bg-depart {
+    background: linear-gradient(135deg, #70502E, #907857);
+  }
+
+  /* 버튼 active 피드백 */
+  .btn-press:active {
+    transform: scale(0.97);
+  }
+
+  .card-press:active {
+    transform: scale(0.98);
+  }
 }

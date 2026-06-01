@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Inter } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
-const dmSerif = DM_Serif_Display({
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-dm-serif",
+const notoSansKR = Noto_Sans_KR({
+  weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
-});
-
-const pretendard = Inter({
-  variable: "--font-pretendard",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,11 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ko"
-      className={`${dmSerif.variable} ${pretendard.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="ko" className={`${notoSansKR.className} h-full`}>
+      <body className="min-h-dvh antialiased">{children}</body>
     </html>
   );
 }

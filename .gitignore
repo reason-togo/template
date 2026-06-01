@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 storybook-static
+
+# design screens (HTML mockups - source of truth, not compiled code)
+/screens
