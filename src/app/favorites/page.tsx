@@ -1,130 +1,179 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { MOCK_PLACES } from '@/shared/mock/places';
-import { PlaceCard } from '@/features/place-card/ui/PlaceCard';
-import { IconButton } from '@/shared/ui/IconButton';
-import { Logo } from '@/shared/ui/Logo';
-import { Button } from '@/shared/ui/button';
-import { ArrowLeft, Heart } from 'lucide-react';
-import { Place } from '@/entities/place/model/types';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { StatusBar } from "@/shared/ui/StatusBar";
+import { BottomNavigation } from "@/shared/ui/BottomNavigation";
 
-const FavoritesPage = () => {
+interface FavoriteItem {
+  id: string;
+  name: string;
+  location: string;
+  savedAt: string;
+  tags?: string[];
+}
+
+const GRADIENT_BGS = [
+  "linear-gradient(160deg,#5C3D1E,#907857)",
+  "linear-gradient(160deg,#8B7355,#70502E)",
+  "linear-gradient(160deg,#907857,#6B4F2C)",
+  "linear-gradient(160deg,#7A6A4A,#907857)",
+  "linear-gradient(160deg,#70502E,#AF9F7F)",
+];
+
+const FILTERS = ["전체", "산책", "문화유산", "무료·저렴", "당일치기"];
+
+function formatSavedDate(iso: string): string {
+  try {
+    const saved = new Date(iso);
+    const now = new Date();
+    const diffMs = now.getTime() - saved.getTime();
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffDays === 0) return "오늘 저장";
+    if (diffDays < 7) return `${diffDays}일 전 저장`;
+    if (diffDays < 14) return "1주 전 저장";
+    return `${Math.floor(diffDays / 7)}주 전 저장`;
+  } catch {
+    return "저장됨";
+  }
+}
+
+export default function FavoritesPage() {
   const router = useRouter();
-  const [favorites, setFavorites] = useState<Place[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [activeFilter, setActiveFilter] = useState("전체");
 
   useEffect(() => {
-    // localStorage에서 찜 목록 가져오기
-    const favoriteIds = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const favoritePlaces = MOCK_PLACES.filter((place) =>
-      favoriteIds.includes(place.id)
-    );
-    setFavorites(favoritePlaces);
+    try {
+      const arr = JSON.parse(localStorage.getItem("favorites") ?? "[]");
+      setFavorites(arr);
+    } catch {}
   }, []);
 
-  const handleBack = () => {
-    router.back();
+  const handleUnsave = (id: string) => {
+    setFavorites((prev) => {
+      const next = prev.filter((f) => f.id !== id);
+      try {
+        localStorage.setItem("favorites", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
   };
 
-  const handleCreateCourse = () => {
-    alert('코스 만들기 기능은 곧 지원됩니다!');
-  };
-
-  const handleGoToHome = () => {
-    router.push('/');
-  };
-
-  if (favorites.length === 0) {
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-          <div className="max-w-[390px] mx-auto px-6 py-4 flex items-center justify-between">
-            <IconButton icon={ArrowLeft} onClick={handleBack} />
-            <Logo size="sm" />
-            <div className="w-10" /> {/* Spacer */}
-          </div>
-        </div>
-
-        {/* Empty State */}
-        <div className="max-w-[390px] mx-auto px-6 py-32 text-center space-y-6">
-          <div className="w-20 h-20 mx-auto rounded-full bg-primary-100 flex items-center justify-center">
-            <Heart className="h-10 w-10 text-primary-300" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold text-secondary">
-              찜한 관광지가 없습니다
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              마음에 드는 관광지를 찜해보세요
-            </p>
-          </div>
-          <Button
-            size="lg"
-            onClick={handleGoToHome}
-            className="bg-gradient-to-r from-primary-300 to-primary-400 hover:from-primary-400 hover:to-primary-500 text-white font-semibold shadow-md"
-          >
-            관광지 찜하러 가기
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const displayed = favorites;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-[390px] mx-auto px-6 py-4 flex items-center justify-between">
-          <IconButton icon={ArrowLeft} onClick={handleBack} />
-          <Logo size="sm" />
-          <div className="w-10" /> {/* Spacer */}
-        </div>
-      </div>
+    <div className="screen bg-app-bg flex flex-col">
+      <StatusBar />
 
-      <div className="max-w-[390px] mx-auto px-6 py-8 space-y-6">
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-bold text-secondary mb-2">
-            찜한 관광지
+      {/* 헤더 */}
+      <div className="px-5 mb-3.5 flex-shrink-0">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-[22px] font-extrabold text-brown-900" style={{ letterSpacing: "-0.025em" }}>
+            찜한 여행지
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {favorites.length}개의 관광지를 찜했어요
-          </p>
+          <span className="text-[13px] text-brown-500">{favorites.length}곳</span>
         </div>
 
-        {/* Favorites List */}
-        <div className="space-y-4">
-          {favorites.map((place) => (
-            <PlaceCard.Root key={place.id}>
-              <PlaceCard.Image src={place.imageUrl} alt={place.name} />
-              <PlaceCard.Content>
-                <PlaceCard.Header title={place.name} location={place.location} />
-                <p className="text-sm text-secondary leading-relaxed">
-                  {place.description}
-                </p>
-                <PlaceCard.Stats
-                  time={place.estimatedTime}
-                  cost={place.estimatedCost}
-                />
-              </PlaceCard.Content>
-            </PlaceCard.Root>
+        {/* 필터 칩 */}
+        <div className="flex gap-2 overflow-x-auto pb-px">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              className={`flex-shrink-0 rounded-2xl px-3.5 py-1.5 text-[12.5px] border transition-all duration-150 whitespace-nowrap select-none ${
+                activeFilter === f
+                  ? "bg-brown-900 border-brown-900 text-white font-semibold"
+                  : "bg-cream-50 border-brown-200 text-brown-500"
+              }`}
+            >
+              {f}
+            </button>
           ))}
         </div>
-
-        {/* Create Course Button (Disabled) */}
-        <Button
-          size="lg"
-          onClick={handleCreateCourse}
-          disabled
-          className="w-full bg-gradient-to-r from-primary-300 to-primary-400 text-white font-semibold shadow-md opacity-50 cursor-not-allowed"
-        >
-          선택한 관광지로 코스 만들기
-        </Button>
       </div>
+
+      {/* 카드 목록 */}
+      <div className="flex-1 overflow-y-auto px-5 pb-[90px] flex flex-col gap-3">
+        {displayed.length > 0 ? (
+          displayed.map((item, i) => (
+            <div
+              key={item.id}
+              className="bg-cream-50 rounded-[18px] overflow-hidden shadow-card flex card-press cursor-pointer"
+              onClick={() => router.push(`/place/${item.id}`)}
+            >
+              {/* 이미지 영역 */}
+              <div
+                className="w-[110px] flex-shrink-0 min-h-[100px]"
+                style={{ background: GRADIENT_BGS[i % GRADIENT_BGS.length] }}
+              />
+
+              {/* 본문 */}
+              <div className="flex-1 p-3.5">
+                <div className="text-[15px] font-bold text-brown-900 mb-0.5" style={{ letterSpacing: "-0.01em" }}>
+                  {item.name}
+                </div>
+                <div className="text-[12px] text-brown-500 mb-2">📍 {item.location}</div>
+
+                {/* 태그 */}
+                {item.tags && item.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2.5">
+                    {item.tags.map((t) => (
+                      <span
+                        key={t}
+                        className={`text-[10.5px] px-2 py-0.5 rounded-md ${
+                          t === "무료"
+                            ? "bg-brown-700/10 text-brown-700"
+                            : "bg-brown-100 text-brown-500"
+                        }`}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* 푸터 */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[10.5px] text-brown-400">{formatSavedDate(item.savedAt)}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUnsave(item.id);
+                    }}
+                    className="text-[18px] p-1 leading-none"
+                  >
+                    ❤️
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          /* 빈 상태 */
+          <div className="flex flex-col items-center justify-center flex-1 gap-3.5 text-center py-16">
+            <div className="text-[52px] opacity-60">🤍</div>
+            <div>
+              <div className="text-[18px] font-bold text-brown-900 mb-1">아직 찜한 여행지가 없어요</div>
+              <p className="text-[13.5px] text-brown-500 leading-[1.6]">
+                마음에 드는 여행지를 발견하면
+                <br />
+                하트를 눌러 저장해 보세요
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/recommendations")}
+              className="mt-2 bg-brown-700 text-cream-50 rounded-[14px] px-6 py-3 text-[15px] font-bold btn-press"
+            >
+              AI 추천 받기
+            </button>
+          </div>
+        )}
+
+        <div className="h-2" />
+      </div>
+
+      <BottomNavigation active="favorites" />
     </div>
   );
-};
-
-export default FavoritesPage;
+}

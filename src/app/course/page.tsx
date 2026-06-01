@@ -215,7 +215,7 @@ export default function CoursePage() {
         </button>
       </div>
 
-      <HomeBar className="absolute" style={{ bottom: 0 } as React.CSSProperties} />
+      <HomeBar />
     </div>
   );
 }

@@ -19,7 +19,7 @@ const STEPS: Step[] = [
   { icon: "🌤️", label: "날씨 정보 불러오는 중", note: "기상청 API 연동", doneLabel: "날씨 분석 완료", delay: 400, doneAt: 1400, progress: 25 },
   { icon: "📍", label: "현재 위치 확인", note: "TourAPI 지역 매핑", doneLabel: "지역 매핑 완료", delay: 1600, doneAt: 2800, progress: 50 },
   { icon: "🌇", label: "일몰 시간 계산", note: "Sunrise-Sunset API", doneLabel: "일몰 시간 확인 완료", delay: 3000, doneAt: 4000, progress: 75 },
-  { icon: "🤖", label: "맞춤 코스 생성 중", note: "AI 감성 스토리 생성", doneLabel: "코스 생성 완료", delay: 4200, doneAt: 6000, progress: 100 },
+  { icon: "🤖", label: "맞춤 코스 생성 중", note: "LaaS AI 감성 스토리 생성", doneLabel: "코스 생성 완료", delay: 4200, doneAt: 6000, progress: 100 },
 ];
 
 type StepState = "pending" | "active" | "done";
@@ -31,6 +31,8 @@ export default function AnalyzePage() {
   const [visibleSteps, setVisibleSteps] = useState([false, false, false, false]);
   const [progress, setProgress] = useState(0);
   const [progPct, setProgPct] = useState("0%");
+  // LaaS 사용 모드: null=로딩 중, "laas"=AI 큐레이션 성공, "fallback"=규칙 기반 사용
+  const [curatMode, setCurateMode] = useState<"laas" | "fallback" | null>(null);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -51,38 +53,44 @@ export default function AnalyzePage() {
       }, s.doneAt);
     });
 
-    // 실제 API 호출
+    // 취향 데이터 sessionStorage에서 로드
     const prefs = (() => {
       try { return JSON.parse(sessionStorage.getItem("preferences") ?? "{}"); } catch { return {}; }
     })();
 
+    // POST /api/curate 호출 공통 처리
+    // _mode 플래그로 LaaS AI 큐레이션 vs 규칙 기반 폴백 여부를 UI에 표시합니다.
+    const callCurate = async (lat: number, lng: number) => {
+      try {
+        const res = await fetch("/api/curate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ preferences: prefs.answers ?? {}, lat, lng }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          sessionStorage.setItem("curation", JSON.stringify(data));
+          // LaaS 사용 여부를 상태에 반영 — 화면에 알림 배너 표시
+          setCurateMode(data._mode === "laas" ? "laas" : "fallback");
+        } else {
+          // API 오류 응답 — 폴백 모드로 표시
+          setCurateMode("fallback");
+        }
+      } catch (e) {
+        console.error("[Analyze] /api/curate 호출 실패:", e);
+        setCurateMode("fallback");
+      }
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
-        try {
-          const res = await fetch("/api/curate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ preferences: prefs.answers ?? {}, lat, lng }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            sessionStorage.setItem("curation", JSON.stringify(data));
-          }
-        } catch (e) {
-          console.error("Curate error:", e);
-        }
+        await callCurate(lat, lng);
         setTimeout(() => router.push("/recommendations"), 6600);
       },
-      () => {
-        // 위치 거부 시 서울 기본값
-        fetch("/api/curate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preferences: prefs.answers ?? {}, lat: 37.5665, lng: 126.978 }),
-        }).then((r) => r.ok ? r.json() : null)
-          .then((data) => { if (data) sessionStorage.setItem("curation", JSON.stringify(data)); })
-          .catch(() => {});
+      async () => {
+        // 위치 권한 거부 시 서울 시청 좌표(37.5665, 126.978)를 기본값으로 사용
+        await callCurate(37.5665, 126.978);
         setTimeout(() => router.push("/recommendations"), 6600);
       },
       { timeout: 5000 }
@@ -119,6 +127,33 @@ export default function AnalyzePage() {
           <br />
           실시간으로 분석해 최적의 여행지를 찾고 있어요
         </p>
+
+        {/* LaaS 모드 알림 배너 — API 호출 완료 후 표시 */}
+        {curatMode && (
+          <div
+            className={`w-full mb-6 rounded-[14px] px-4 py-3 flex items-center gap-2.5 transition-all duration-500 ${
+              curatMode === "laas"
+                ? "bg-brown-700/10 border border-brown-700/30"
+                : "bg-brown-100 border border-brown-200"
+            }`}
+          >
+            <span className="text-xl flex-shrink-0">
+              {curatMode === "laas" ? "✨" : "ℹ️"}
+            </span>
+            <div>
+              <div className={`text-[13px] font-semibold ${curatMode === "laas" ? "text-brown-700" : "text-brown-900"}`}>
+                {curatMode === "laas"
+                  ? "LaaS AI 큐레이션 완료"
+                  : "기본 추천 모드로 실행 중"}
+              </div>
+              <div className="text-[11.5px] text-brown-500 mt-0.5">
+                {curatMode === "laas"
+                  ? "취향·날씨·시간을 반영한 AI 감성 스토리가 준비됐어요"
+                  : "LaaS API 키 미설정 — TourAPI 기반 추천 결과를 제공합니다"}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 단계 목록 */}
         <div className="w-full flex flex-col gap-3.5">
