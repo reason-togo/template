@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService1";
+const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // serviceKey는 별도로 처리 (인코딩 이슈 방지)
     const params = new URLSearchParams({
-      serviceKey,
       numOfRows: "20",
       pageNo: "1",
       MobileOS: "ETC",
@@ -26,13 +26,31 @@ export async function GET(req: NextRequest) {
       ...(sigunguCode ? { sigunguCode } : {}),
     });
 
-    const res = await fetch(
-      `${TOUR_API_BASE}/areaBasedList1?${params}`,
-      { next: { revalidate: 3600 } }
-    );
-    if (!res.ok) throw new Error("TourAPI error");
+    const url = `${TOUR_API_BASE}/areaBasedList2?serviceKey=${serviceKey}&${params}`;
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("TourAPI HTTP error:", {
+        status: res.status,
+        statusText: res.statusText,
+        url,
+        response: errorText
+      });
+      throw new Error(`TourAPI HTTP ${res.status}: ${res.statusText}`);
+    }
 
     const data = await res.json();
+
+    // TourAPI는 HTTP 200이어도 response.header.resultCode로 에러를 반환할 수 있음
+    if (data?.response?.header?.resultCode !== "0000") {
+      console.error("TourAPI result error:", {
+        resultCode: data?.response?.header?.resultCode,
+        resultMsg: data?.response?.header?.resultMsg,
+        url
+      });
+    }
+
     const items = data?.response?.body?.items?.item ?? [];
 
     return NextResponse.json({

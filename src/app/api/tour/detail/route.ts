@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService1";
+const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -16,12 +16,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "TOUR_API_KEY not set" }, { status: 503 });
   }
 
-  const base = { serviceKey, MobileOS: "ETC", MobileApp: "TteanalIyu", _type: "json", contentId };
+  // serviceKey는 별도로 처리 (인코딩 이슈 방지)
+  const base = { MobileOS: "ETC", MobileApp: "TteanalIyu", _type: "json", contentId };
 
   try {
     const [commonRes, imageRes] = await Promise.allSettled([
-      fetch(`${TOUR_API_BASE}/detailCommon1?${new URLSearchParams({ ...base, defaultYN: "Y", firstImageYN: "Y", addrinfoYN: "Y", mapinfoYN: "Y", overviewYN: "Y" })}`, { next: { revalidate: 3600 } }),
-      fetch(`${TOUR_API_BASE}/detailImage1?${new URLSearchParams({ ...base, imageYN: "Y", subImageYN: "Y" })}`, { next: { revalidate: 3600 } }),
+      fetch(`${TOUR_API_BASE}/detailCommon2?serviceKey=${serviceKey}&${new URLSearchParams({ ...base, defaultYN: "Y", firstImageYN: "Y", addrinfoYN: "Y", mapinfoYN: "Y", overviewYN: "Y" })}`, { next: { revalidate: 3600 } }),
+      fetch(`${TOUR_API_BASE}/detailImage2?serviceKey=${serviceKey}&${new URLSearchParams({ ...base, imageYN: "Y", subImageYN: "Y" })}`, { next: { revalidate: 3600 } }),
     ]);
 
     let common = null;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService1";
+const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
 
   for (const r of radii) {
     try {
+      // serviceKey는 별도로 처리 (인코딩 이슈 방지)
       const params = new URLSearchParams({
-        serviceKey,
         numOfRows: "10",
         pageNo: "1",
         MobileOS: "ETC",
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       });
 
       const res = await fetch(
-        `${TOUR_API_BASE}/locationBasedList1?${params}`,
+        `${TOUR_API_BASE}/locationBasedList2?serviceKey=${serviceKey}&${params}`,
         { next: { revalidate: 1800 } }
       );
       if (!res.ok) continue;
