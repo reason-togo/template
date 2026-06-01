@@ -17,7 +17,13 @@ interface CourseItem {
 }
 
 interface CurationResult {
-  main?: { name: string; location: string; estimatedCost?: string };
+  main?: {
+    name: string;
+    location: string;
+    estimatedCost?: string;
+    mapX?: string;
+    mapY?: string;
+  };
   course?: CourseItem[];
   context?: { weather?: string; sunsetRemaining?: string; sunsetTime?: string };
 }
@@ -44,6 +50,23 @@ export default function CoursePage() {
   const now = new Date();
   const arrivalTime = new Date(now.getTime() + 35 * 60000);
   const fmt = (d: Date) => d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+
+  // 지도 앱에서 길찾기 열기
+  const handleStartNavigation = () => {
+    if (!main?.mapX || !main?.mapY) {
+      alert("위치 정보를 불러올 수 없습니다.");
+      return;
+    }
+
+    // 좌표 변환: TourAPI는 경도(mapX), 위도(mapY) 형식
+    const lng = parseFloat(main.mapX);
+    const lat = parseFloat(main.mapY);
+
+    // Kakao Map 길찾기 (한국에서 가장 많이 사용)
+    const kakaoUrl = `https://map.kakao.com/link/to/${encodeURIComponent(main.name)},${lat},${lng}`;
+
+    window.open(kakaoUrl, "_blank");
+  };
 
   return (
     <div className="screen bg-app-bg flex flex-col">
@@ -207,7 +230,10 @@ export default function CoursePage() {
         >
           ↑
         </button>
-        <button className="flex-1 h-[50px] bg-brown-900 text-cream-50 rounded-[14px] text-[15px] font-bold btn-press flex items-center justify-center gap-2">
+        <button
+          onClick={handleStartNavigation}
+          className="flex-1 h-[50px] bg-brown-900 text-cream-50 rounded-[14px] text-[15px] font-bold btn-press flex items-center justify-center gap-2"
+        >
           지금 출발하기
           {main?.estimatedCost && (
             <span className="text-brown-200">· {main.estimatedCost}</span>
