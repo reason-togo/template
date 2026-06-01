@@ -5,7 +5,6 @@ const TOUR_API_BASE = "https://apis.data.go.kr/B551011/KorService2";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const contentId = searchParams.get("contentId");
-  const contentTypeId = searchParams.get("contentTypeId") ?? "12";
 
   if (!contentId) {
     return NextResponse.json({ error: "contentId required" }, { status: 400 });

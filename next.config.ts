@@ -14,11 +14,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // 실험적 기능
-  experimental: {
-    optimizeCss: true,
-  },
-
   // 외부 이미지 도메인 허용
   images: {
     remotePatterns: [
