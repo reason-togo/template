@@ -69,6 +69,60 @@ function buildFallbackResult(items: Record<string, string>[], context: Context, 
   };
 }
 
+// 좌표 기반 지역코드 매핑 함수
+function getAreaCodeFromCoordinates(lat: number, lng: number): string {
+  // 제주도
+  if (lat >= 33.1 && lat <= 33.6 && lng >= 126.1 && lng <= 126.9) return "39";
+
+  // 부산
+  if (lat >= 34.8 && lat <= 35.4 && lng >= 128.8 && lng <= 129.3) return "6";
+
+  // 대구
+  if (lat >= 35.6 && lat <= 36.0 && lng >= 128.3 && lng <= 129.0) return "4";
+
+  // 울산
+  if (lat >= 35.3 && lat <= 35.7 && lng >= 128.9 && lng <= 129.5) return "7";
+
+  // 광주
+  if (lat >= 35.0 && lat <= 35.3 && lng >= 126.7 && lng <= 127.0) return "5";
+
+  // 대전
+  if (lat >= 36.2 && lat <= 36.5 && lng >= 127.2 && lng <= 127.6) return "3";
+
+  // 세종
+  if (lat >= 36.4 && lat <= 36.7 && lng >= 127.1 && lng <= 127.4) return "8";
+
+  // 인천
+  if (lat >= 37.2 && lat <= 37.6 && lng >= 126.3 && lng <= 126.9) return "2";
+
+  // 서울
+  if (lat >= 37.4 && lat <= 37.7 && lng >= 126.7 && lng <= 127.2) return "1";
+
+  // 강원도
+  if (lat >= 37.0 && lng >= 127.5) return "32";
+
+  // 경북
+  if (lat >= 35.5 && lat <= 37.5 && lng >= 128.0 && lng <= 129.5) return "35";
+
+  // 경남
+  if (lat >= 34.5 && lat <= 35.5 && lng >= 127.5 && lng <= 129.0) return "36";
+
+  // 전북
+  if (lat >= 35.5 && lat <= 36.5 && lng >= 126.5 && lng <= 127.5) return "37";
+
+  // 전남
+  if (lat >= 34.0 && lat <= 35.5 && lng >= 126.0 && lng <= 127.5) return "38";
+
+  // 충북
+  if (lat >= 36.0 && lat <= 37.5 && lng >= 127.3 && lng <= 128.5) return "33";
+
+  // 충남
+  if (lat >= 36.0 && lat <= 37.0 && lng >= 126.0 && lng <= 127.5) return "34";
+
+  // 경기도 (기본값 - 가장 넓은 범위)
+  return "31";
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { preferences, lat, lng } = body as {
@@ -79,14 +133,17 @@ export async function POST(req: NextRequest) {
 
   const baseUrl = req.nextUrl.origin;
 
+  // 좌표 기반 지역코드 매핑
+  const areaCode = getAreaCodeFromCoordinates(lat, lng);
+
   // Step 1: 날씨·일몰·관광지 병렬 조회
   // - /api/weather: OpenWeatherMap API (OPENWEATHER_KEY 필요)
   // - /api/sun: Sunrise-Sunset.org API (키 불필요)
-  // - /api/tour/area: TourAPI areaBasedList1 (TOUR_API_KEY 필요)
+  // - /api/tour/area: TourAPI areaBasedList2 (TOUR_API_KEY 필요)
   const [weatherRes, sunRes, tourRes] = await Promise.allSettled([
     fetch(`${baseUrl}/api/weather?lat=${lat}&lng=${lng}`),
     fetch(`${baseUrl}/api/sun?lat=${lat}&lng=${lng}`),
-    fetch(`${baseUrl}/api/tour/area?areaCode=12`), // TODO: 취향 응답의 지역 코드로 동적 매핑 필요
+    fetch(`${baseUrl}/api/tour/area?areaCode=${areaCode}`),
   ]);
 
   const weather = weatherRes.status === "fulfilled" && weatherRes.value.ok
@@ -101,12 +158,18 @@ export async function POST(req: NextRequest) {
     ? (await tourRes.value.json()).items ?? []
     : [];
 
-  if (tourItems.length === 0) {
+  // 이미지가 있는 항목만 필터링
+  const itemsWithImages = tourItems.filter((item: Record<string, string>) => item.firstimage);
+
+  if (itemsWithImages.length === 0) {
+    console.warn(`TourAPI: areaCode=${areaCode}에서 이미지가 있는 관광지를 찾을 수 없음 (전체: ${tourItems.length}개)`);
     return NextResponse.json({
-      error: "관광지 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
+      error: "해당 지역의 관광지 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
       _mode: "error",
     }, { status: 503 });
   }
+
+  console.log(`TourAPI: areaCode=${areaCode}, 전체 ${tourItems.length}개 중 이미지 있는 항목 ${itemsWithImages.length}개 사용`);
 
   const context: Context = { weather, sun, lat, lng };
 
@@ -130,7 +193,7 @@ export async function POST(req: NextRequest) {
           hash: process.env.LAAS_HASH_1,
           params: {
             candidates: JSON.stringify(
-              tourItems.slice(0, 10).map((i: Record<string, string>) => ({
+              itemsWithImages.slice(0, 10).map((i: Record<string, string>) => ({
                 id: i.contentid,
                 name: i.title,
                 address: i.addr1,
@@ -145,21 +208,21 @@ export async function POST(req: NextRequest) {
       if (!laasCall1.ok) {
         // LaaS Call 1 실패 — HTTP 오류 코드 로그 후 폴백으로 전환
         console.warn(`[LaaS] Call 1 실패 (HTTP ${laasCall1.status}) — 규칙 기반 폴백으로 전환`);
-        const result = buildFallbackResult(tourItems, context, preferences);
+        const result = buildFallbackResult(itemsWithImages, context, preferences);
         return NextResponse.json(result);
       }
 
       const call1Data = await laasCall1.json();
       console.log("[LaaS] Call 1 완료 — 메인 관광지 선정됨:", call1Data?.result?.contentId);
 
-      const mainId = call1Data?.result?.contentId ?? tourItems[0]?.contentid;
-      const mainItem = tourItems.find((i: Record<string, string>) => i.contentid === mainId) ?? tourItems[0];
+      const mainId = call1Data?.result?.contentId ?? itemsWithImages[0]?.contentid;
+      const mainItem = itemsWithImages.find((i: Record<string, string>) => i.contentid === mainId) ?? itemsWithImages[0];
 
       // Step 2-a: 선정된 메인 관광지 주변 관광지 조회 (TourAPI locationBasedList1)
       const nearbyRes = await fetch(
         `${baseUrl}/api/tour/nearby?mapX=${mainItem.mapx}&mapY=${mainItem.mapy}`
       );
-      const nearbyItems = nearbyRes.ok ? (await nearbyRes.json()).items ?? [] : tourItems.slice(1);
+      const nearbyItems = nearbyRes.ok ? (await nearbyRes.json()).items ?? [] : itemsWithImages.slice(1);
 
       // LaaS Call 2: 메인 관광지 + 주변 관광지 기반으로 코스·스토리 생성
       // params: main(메인 관광지), nearby(주변 5곳), preferences(취향), context(날씨·일몰 시각)
@@ -192,7 +255,7 @@ export async function POST(req: NextRequest) {
       if (!laasCall2.ok) {
         // LaaS Call 2 실패 — 메인 관광지는 확정됐으므로 메인은 LaaS 결과, 코스는 폴백
         console.warn(`[LaaS] Call 2 실패 (HTTP ${laasCall2.status}) — 규칙 기반 폴백으로 전환`);
-        const result = buildFallbackResult(tourItems, context, preferences);
+        const result = buildFallbackResult(itemsWithImages, context, preferences);
         return NextResponse.json(result);
       }
 
@@ -221,6 +284,6 @@ export async function POST(req: NextRequest) {
   }
 
   // Step 3: 규칙 기반 폴백 — TourAPI 결과의 순서를 그대로 사용
-  const result = buildFallbackResult(tourItems, context, preferences);
+  const result = buildFallbackResult(itemsWithImages, context, preferences);
   return NextResponse.json(result);
 }
