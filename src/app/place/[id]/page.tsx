@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { StatusBar } from "@/shared/ui/StatusBar";
 
@@ -20,7 +20,15 @@ interface PlaceDetail {
 
 interface CurationResult {
   main?: PlaceDetail;
-  course?: Array<{ order: number; name: string; location: string; duration?: string; transport?: string }>;
+  course?: Array<{
+    order: number;
+    contentId?: string;
+    name: string;
+    location: string;
+    imageUrl?: string;
+    duration?: string;
+    transport?: string;
+  }>;
   context?: { weather?: string; sunsetRemaining?: string; sunsetTime?: string };
 }
 
@@ -44,6 +52,7 @@ const HeroMountain = () => (
 
 export default function PlaceDetailPage() {
   const router = useRouter();
+  const params = useParams();
   const [place, setPlace] = useState<PlaceDetail | null>(null);
   const [courseSteps, setCourseSteps] = useState<CurationResult["course"]>([]);
   const [ctx, setCtx] = useState<CurationResult["context"]>();
@@ -54,17 +63,42 @@ export default function PlaceDetailPage() {
       const raw = sessionStorage.getItem("curation");
       if (raw) {
         const data: CurationResult = JSON.parse(raw);
-        setPlace(data.main ?? null);
+        const id = params.id as string;
+
+        // id가 "main"이거나 main의 contentId와 일치하면 main 사용
+        if (id === "main" || id === data.main?.contentId) {
+          setPlace(data.main ?? null);
+        } else {
+          // course에서 해당 contentId 찾기
+          const courseItem = data.course?.find((item) => item.contentId === id);
+          if (courseItem) {
+            // course 아이템을 PlaceDetail 형식으로 변환
+            setPlace({
+              name: courseItem.name,
+              location: courseItem.location,
+              imageUrl: courseItem.imageUrl,
+              contentId: courseItem.contentId,
+              // course에는 상세 정보가 없으므로 기본값 사용
+              aiStory: `${courseItem.name}을(를) 방문해보세요.`,
+              estimatedTime: courseItem.duration,
+              transitInfo: courseItem.transport,
+            });
+          } else {
+            // 못 찾으면 main 사용
+            setPlace(data.main ?? null);
+          }
+        }
+
         setCourseSteps(data.course ?? []);
         setCtx(data.context);
 
         const arr = JSON.parse(localStorage.getItem("favorites") ?? "[]");
-        if (data.main?.contentId && arr.find((x: { id: string }) => x.id === data.main?.contentId)) {
+        if (id && arr.find((x: { id: string }) => x.id === id)) {
           setSaved(true);
         }
       }
     } catch {}
-  }, []);
+  }, [params.id]);
 
   const handleSave = () => {
     setSaved((v) => !v);
